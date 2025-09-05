@@ -1,0 +1,129 @@
+return {
+  -- Packer.nvim replacement (not needed with Lazy)
+  -- "wbthomason/packer.nvim",
+
+  -- Mason + LSP
+  {
+    "williamboman/mason.nvim",
+    build = ":MasonUpdate", -- changed from 'run' to 'build'
+    config = true, -- auto-loads default config
+  },
+  {
+    "williamboman/mason-lspconfig.nvim",
+    dependencies = { "neovim/nvim-lspconfig" },
+    config = true,
+  },
+  { "neovim/nvim-lspconfig", config = true },
+
+  -- waksAI (local plugin)
+  { dir = "~/path/to/nvim/waksAI" },
+
+  -- Completion
+  {
+    "hrsh7th/nvim-cmp",
+    dependencies = {
+      "hrsh7th/cmp-nvim-lsp",
+      "hrsh7th/cmp-buffer",
+      "hrsh7th/cmp-path",
+      "hrsh7th/cmp-cmdline",
+      "L3MON4D3/LuaSnip",
+      "saadparwaiz1/cmp_luasnip",
+    },
+    config = true, -- we'll keep your cmp setup in init.lua
+  },
+  { "rafamadriz/friendly-snippets" },
+
+  -- Hover
+  {
+    "lewis6991/hover.nvim",
+    config = function()
+      require("hover").setup {
+        init = function()
+          require("hover.providers.lsp")
+        end,
+        preview_opts = { border = "single" },
+        title = true,
+        mouse_providers = { "LSP" },
+        mouse_delay = 1000,
+      }
+      vim.keymap.set("n", "K", require("hover").hover, { desc = "hover.nvim" })
+      vim.keymap.set("n", "<MouseMove>", require("hover").hover_mouse, { desc = "hover.nvim (mouse)" })
+      vim.o.mousemoveevent = true
+    end
+  },
+
+  -- Colors & Effects
+  { "folke/tokyonight.nvim" },
+  { "nvim-tree/nvim-web-devicons" },
+  { "nvim-lualine/lualine.nvim" },
+  { "norcalli/nvim-colorizer.lua" },
+  { "HiPhish/rainbow-delimiters.nvim" },
+  { "xiyaowong/transparent.nvim" },
+
+  -- Syntax Highlighting
+  {
+    "nvim-treesitter/nvim-treesitter",
+    build = ":TSUpdate", -- changed from 'run' to 'build'
+    config = true,
+  },
+
+  -- File Explorer
+  { "nvim-tree/nvim-tree.lua" },
+
+  -- Telescope
+  {
+    "nvim-telescope/telescope.nvim",
+    dependencies = { "nvim-lua/plenary.nvim" },
+    config = true,
+  },
+  {
+    'isak102/telescope-git-file-history.nvim',
+    dependencies = {
+      'nvim-telescope/telescope.nvim',
+      'tpope/vim-fugitive'
+    },
+    config = function()
+      require('telescope').load_extension('git_file_history')
+    end
+  },
+
+  -- Autopairs
+  {
+    "windwp/nvim-autopairs",
+    config = function() require("nvim-autopairs").setup {} end
+  },
+
+  -- Emmet
+  { 'mattn/emmet-vim' },
+
+  -- Autotag
+  {
+    'windwp/nvim-ts-autotag',
+    config = function() require('nvim-ts-autotag').setup() end
+  },
+
+  -- Git
+  { "lewis6991/gitsigns.nvim" },
+
+  -- CodeCompanion
+  -- { "olimorris/codecompanion.nvim" },
+
+  
+-- Which-key
+  {
+    "folke/which-key.nvim",
+    config = function()
+      local wk = require("which-key")
+
+      wk.setup({
+        triggers = {
+          { "<leader>", mode = { "n", "v" } },
+          { "<C-Y>",    mode = { "i" } }, -- example if you want your insert maps
+        },
+      })
+    end
+    },
+}
+
+
+

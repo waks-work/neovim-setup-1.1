@@ -1,0 +1,85 @@
+
+return {
+  {
+    "olimorris/codecompanion.nvim",
+    dependencies = {
+      "nvim-lua/plenary.nvim",
+      "nvim-treesitter/nvim-treesitter",
+      "MunifTanjim/nui.nvim",
+    },
+    config = function()
+      local api_key = os.getenv("DEEPSEEK_API_KEY")
+      local ollama_host = "http://localhost:11434"
+
+      require("codecompanion").setup({
+        adapters = {
+          http = {
+            deepseek_local = "ollama",
+            stable_code   = "ollama",
+            opts = {
+              deepseek_local = {
+                model = "deepseek-coder:1.3b",
+                host = ollama_host,
+                temperature = 0.2,
+                num_ctx = 2048,
+                top_p = 0.9,
+                top_k = 40,
+              },
+              stable_code = {
+                model = "stable-code:3b-code-q4_0",
+                host = ollama_host,
+                temperature = 0.2,
+                num_ctx = 2048,
+                top_p = 0.9,
+                top_k = 40,
+              },
+            },
+          },
+          https = {
+            deepseek_online = "deepseek",
+            opts = {
+              deepseek_online = {
+                api_key = api_key,
+                timeout = 30000,
+              },
+            },
+          },
+        },
+        strategies = {
+          chat   = { adapter = api_key and "https.deepseek_online" or "http.deepseek_local" },
+          inline = { adapter = "http.stable_code" },
+          agent  = { adapter = "http.deepseek_local" },
+        },
+        keymaps = {
+          toggle_chat   = "<leader>cc",
+          inline_accept = "<C-y>",
+          inline_reject = "<C-n>",
+        },
+      })
+
+      -- 🔀 Model switching keymaps
+      vim.keymap.set("n", "<leader>aid", function()
+        require("codecompanion").set_strategy("chat", { adapter = "http.deepseek_local" })
+        vim.notify("Using DeepSeek Local", vim.log.levels.INFO)
+      end, { desc = "Switch to DeepSeek Local" })
+
+      vim.keymap.set("n", "<leader>ais", function()
+        require("codecompanion").set_strategy("chat", { adapter = "http.stable_code" })
+        vim.notify("Using Stable Code", vim.log.levels.INFO)
+      end, { desc = "Switch to Stable Code" })
+
+      vim.keymap.set("n", "<leader>aio", function()
+        if api_key then
+          require("codecompanion").set_strategy("chat", { adapter = "https.deepseek_online" })
+          vim.notify("Using DeepSeek Online", vim.log.levels.INFO)
+        else
+          vim.notify("DeepSeek API Key not set", vim.log.levels.ERROR)
+        end
+      end, { desc = "Switch to DeepSeek Online" })
+
+      vim.notify("✅ AI keymaps loaded: aid (local), ais (stable), aio (online)", vim.log.levels.INFO)
+    end,
+  },
+}
+
+

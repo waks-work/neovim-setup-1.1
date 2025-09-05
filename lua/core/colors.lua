@@ -1,5 +1,5 @@
 -- Base theme
--- vim.cmd[[colorscheme tokyonight]]
+vim.cmd[[colorscheme tokyonight]]
 
 -- Load colorscheme safely
 local ok, _ = pcall(vim.cmd, "colorscheme tokyonight")
@@ -28,15 +28,6 @@ local function set_transparency()
   ]])
 end
 set_transparency()
-
--- Transparent background
-require("transparent").setup({
-  enable = true,
-  extra_groups = { "NormalFloat", "NvimTreeNormal" }
-})
-
--- Enable color highlights for hex/rgb codes
--- require("colorizer").setup()
 
 -- Iridescent effect: shift cursorline color dynamically
 vim.api.nvim_create_autocmd("CursorMoved", {

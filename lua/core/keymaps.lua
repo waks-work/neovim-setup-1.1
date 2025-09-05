@@ -41,5 +41,7 @@ map("n", "<A-c>", "<cmd>bd<CR>", { desc = "Close Buffer", silent = true })
 -- ======================
 vim.g.user_emmet_expandabbr_key = '<C-e>'
 
-
+-- ======================
+-- BETTER NAVIGATION 
+-- ====================== 
 
