@@ -12,5 +12,8 @@ return {
   -- { import = "plugins.deepseek"}, -- AI
   { import = "plugins.snacks" },
   { import = "plugins.toggleterm" },
-  { import = "plugins.obsidian" },
+  { import = "plugins.rust" },
+  { import = "plugins.debug" },
+  { import = "plugins.waksAI" },
+  -- { import = "plugins.obsidian" },
 }

@@ -1,5 +1,5 @@
 
-return {
+eturn {
   {
     "epwalsh/obsidian.nvim",
     version = "*", -- latest stable

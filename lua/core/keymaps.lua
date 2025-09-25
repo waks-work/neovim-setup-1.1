@@ -41,6 +41,32 @@ map("n", "<A-c>", "<cmd>bd<CR>", { desc = "Close Buffer", silent = true })
 -- ======================
 vim.g.user_emmet_expandabbr_key = '<C-e>'
 
+map({ "n", "v" }, "<leader>wv", function()
+  local mode = vim.fn.mode()
+  if mode:find("[vV]") then
+    require("waksAI").explain_visual()
+  else
+    local lines = vim.api.nvim_buf_get_lines(0, 0, -1, false)
+    local code = table.concat(lines, "\n")
+    local prompt = "Explain this file:\n" .. code
+
+    local ui = require("waksAI.ui")
+    local api = require("waksAI.api")
+
+    ui.open_chat()
+    ui.render_user(prompt)
+
+    api.send(prompt, function(ai_text, code_blocks)
+      ui.render_ai(ai_text)
+      if code_blocks and #code_blocks > 0 then
+        for _, cb in ipairs(code_blocks) do
+          ui.render_ai(cb.code, { is_code = true, lang = cb.lang })
+        end
+      end
+    end)
+  end
+end, { desc = "waksAI: Explain code (selection or file)" })
+
 -- ======================
 -- BETTER NAVIGATION 
 -- ====================== 

@@ -1,30 +1,34 @@
 return {
+  -- Mason core
   {
     "williamboman/mason.nvim",
     build = ":MasonUpdate",
     config = true,
   },
+
+  -- Mason LSP + core LSP config
   {
     "williamboman/mason-lspconfig.nvim",
-    dependencies = { "neovim/nvim-lspconfig" },
+    dependencies = { "neovim/nvim-lspconfig", "hrsh7th/cmp-nvim-lsp" },
     config = function()
       local lspconfig = require("lspconfig")
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
       local on_attach = function(_, bufnr)
         local opts = { buffer = bufnr, noremap = true, silent = true }
+
+        -- LSP keymaps
         vim.keymap.set("n", "gd", vim.lsp.buf.definition, opts)
-        vim.keymap.set("n", "K", vim.lsp.buf.hover, opts)
+        vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
         vim.keymap.set("n", "<leader>rn", vim.lsp.buf.rename, opts)
         vim.keymap.set("n", "<leader>ca", vim.lsp.buf.code_action, opts)
-        vim.keymap.set("n", "gr", vim.lsp.buf.references, opts)
 
         -- Diagnostics
         vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
         vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
-        vim.keymap.set("n", "<leader>b", vim.diagnostic.open_float, opts)
-        vim.keymap.set("n", "<leader>m", vim.diagnostic.setloclist, opts)
+        vim.keymap.set("n", "<leader>e", vim.diagnostic.open_float, opts)
 
+        -- Autoformat
         vim.api.nvim_create_autocmd("BufWritePre", {
           buffer = bufnr,
           callback = function()
@@ -33,15 +37,12 @@ return {
         })
       end
 
-
-
       require("mason-lspconfig").setup({
         ensure_installed = {
           "lua_ls", "html", "cssls", "jsonls",
-          "pyright", "rust_analyzer", "ts_ls",
-
+          "rust_analyzer", "ts_ls", "pyright",
           "bashls", "clangd", "marksman",
-        }
+        },
       })
 
       local servers = {
@@ -57,7 +58,76 @@ return {
       end
     end,
   },
+
+  -- Debugger (DAP + UI + Mason)
   {
-    "neovim/nvim-lspconfig",
+    "jay-babu/mason-nvim-dap.nvim",
+    dependencies = {
+      "williamboman/mason.nvim",
+      "mfussenegger/nvim-dap",
+      "rcarriga/nvim-dap-ui",
+      "nvim-neotest/nvim-nio",
+    },
+    config = function()
+      require("mason-nvim-dap").setup({
+        ensure_installed = { "codelldb", "python", "node2" },
+        automatic_setup = true,
+      })
+
+      local dap, dapui = require("dap"), require("dapui")
+      dapui.setup()
+
+      -- Auto open/close UI
+      dap.listeners.after.event_initialized["dapui_config"] = function() dapui.open() end
+      dap.listeners.before.event_terminated["dapui_config"] = function() dapui.close() end
+      dap.listeners.before.event_exited["dapui_config"] = function() dapui.close() end
+
+      -- Debug keymaps
+      vim.keymap.set("n", "<F5>", dap.continue, { desc = "Continue" })
+      vim.keymap.set("n", "<F10>", dap.step_over, { desc = "Step Over" })
+      vim.keymap.set("n", "<F11>", dap.step_into, { desc = "Step Into" })
+      vim.keymap.set("n", "<F12>", dap.step_out, { desc = "Step Out" })
+      vim.keymap.set("n", "<leader>b", dap.toggle_breakpoint, { desc = "Toggle Breakpoint" })
+    end,
+  },
+
+  -- LSP UI improvements (hover, peek, diagnostics)
+  {
+    "nvimdev/lspsaga.nvim",
+    event = "LspAttach",
+    config = function()
+      require("lspsaga").setup({
+        ui = { border = "rounded", winblend = 10 },
+        diagnostic = { show_code_action = true, show_source = true },
+      })
+
+      vim.keymap.set("n", "K", "<cmd>Lspsaga hover_doc<CR>", { desc = "Hover Docs" })
+      vim.keymap.set("n", "gl", "<cmd>Lspsaga show_line_diagnostics<CR>", { desc = "Line Diagnostics" })
+      vim.keymap.set("n", "gp", "<cmd>Lspsaga peek_definition<CR>", { desc = "Peek Definition" })
+    end,
+  },
+
+  -- VSCode-like polished UI for LSP docs & commandline
+  {
+    "folke/noice.nvim",
+    event = "VeryLazy",
+    dependencies = { "MunifTanjim/nui.nvim", "rcarriga/nvim-notify" },
+    config = function()
+      require("noice").setup({
+        lsp = { hover = { enabled = true }, signature = { enabled = true } },
+        presets = {
+          lsp_doc_border = true,
+          command_palette = true,
+        },
+      })
+    end,
+  },
+
+  -- Optional: LSP progress like VSCode
+  {
+    "j-hui/fidget.nvim",
+    tag = "legacy",
+    event = "LspAttach",
+    config = true,
   },
 }
