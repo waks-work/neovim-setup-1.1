@@ -1,4 +1,3 @@
-
 return {
   {
     "olimorris/codecompanion.nvim",
@@ -15,8 +14,8 @@ return {
         adapters = {
           http = {
             deepseek_local = "ollama",
-            stable_code   = "ollama",
-            opts = {
+            stable_code    = "ollama",
+            opts           = {
               deepseek_local = {
                 model = "deepseek-coder:1.3b",
                 host = ollama_host,
@@ -81,5 +80,3 @@ return {
     end,
   },
 }
-
-

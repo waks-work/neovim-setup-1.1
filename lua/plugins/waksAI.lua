@@ -1,11 +1,18 @@
 return {
+  -- Load local waksAI plugin from your config directory
   dir = vim.fn.stdpath("config") .. "/waksAI",
 
+  -- Lazy load when these commands are executed
   cmd = {
     "WaksAIChat",
     "WaksAIAsk",
-    "WaksUndoLast", -- undo last AI edit
+    "WaksUndoLast",
+    "WaksAIModelSwitch",
+    "WaksAIProviderSwitch",
   },
+
+  -- Optional: load once Neovim finishes startup
+  event = "VeryLazy",
 
   keys = {
     { "<leader>wa", function() require("waksAI").open() end,                     mode = "n", desc = "waksAI: Open chat" },
@@ -18,15 +25,22 @@ return {
   },
 
   config = function()
-    require("waksAI").setup()
+    -- Debug / autoload message (optional)
+    vim.schedule(function()
+      vim.notify("🚀 Loading waksAI...", vim.log.levels.INFO, { title = "lazy.nvim" })
+    end)
 
-    -- Safe registration of undo command
+    -- Initialize plugin
+    require("waksAI").setup()
+    require("waksAI").keymaps()
+
+    -- Safely register undo command
     vim.api.nvim_create_user_command("WaksUndoLast", function()
       local ok, history = pcall(require, "waksAI.history")
       if ok then
         history.undo_last()
       else
-        vim.notify("waksAI.history not found", vim.log.levels.WARN)
+        vim.notify("⚠️ waksAI.history not found", vim.log.levels.WARN)
       end
     end, { desc = "Undo last AI edit" })
   end,

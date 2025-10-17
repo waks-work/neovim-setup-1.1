@@ -2,7 +2,7 @@
 --  KEY MAPS
 -- ======================
 local map = vim.keymap.set
-vim.g.mapleader = " "  -- Make sure this is early!
+vim.g.mapleader = " " -- Make sure this is early!
 
 -- ======================
 -- File Explorer (NvimTree)
@@ -11,8 +11,8 @@ vim.g.mapleader = " "  -- Make sure this is early!
 map("n", "<leader>e", "<cmd>NvimTreeToggle<CR>", { desc = "Toggle File Explorer", silent = true })
 map("n", "<leader>E", "<cmd>NvimTreeFocus<CR>", { desc = "Focus File Explorer", silent = true })
 map("n", "<leader>r", "<cmd>NvimTreeRefresh<CR>", { desc = "Refresh Tree", silent = true })
-map("n", "<leader>f", "<cmd>NvimTreeFindFile<CR>", { desc = "Find Current File", silent = true })
-map("n", "<leader>c", "<cmd>NvimTreeCollapse<CR>", { desc = "Collapse Tree", silent = true })
+map("n", "<leader>ft", "<cmd>NvimTreeFindFile<CR>", { desc = "Find Current File", silent = true })
+map("n", "<leader>cl", "<cmd>NvimTreeCollapse<CR>", { desc = "Collapse Tree", silent = true })
 
 -- ======================
 -- Telescope
@@ -25,7 +25,7 @@ map("n", "<leader>fh", "<cmd>Telescope git_file_history<CR>", { desc = "File His
 -- ======================
 -- Quick Save / Quit
 -- ======================
-map("n", "<leader>w", "<cmd>w<CR>", { desc = "Save File" })
+map("n", "<leader>ww", "<cmd>w<CR>", { desc = "Save File" })
 map("n", "<leader>q", "<cmd>q<CR>", { desc = "Quit Window" })
 
 -- ======================
@@ -35,6 +35,49 @@ map("n", "<A-right>", "<cmd>bnext<CR>", { desc = "Next Buffer", silent = true })
 map("n", "<A-left>", "<cmd>bprev<CR>", { desc = "Previous Buffer", silent = true })
 map("n", "<A-l>", "<cmd>ls<CR>", { desc = "List Buffers", silent = true })
 map("n", "<A-c>", "<cmd>bd<CR>", { desc = "Close Buffer", silent = true })
+
+-- ======================
+-- C++ Specific Keymaps (Buffer-local)
+-- ======================
+-- These will only be set when working with C++ files
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "c", "cpp" },
+  callback = function()
+    -- Set C++ specific options
+    vim.opt_local.tabstop = 4
+    vim.opt_local.shiftwidth = 4
+    vim.opt_local.expandtab = false
+    vim.opt_local.cindent = true
+    vim.opt_local.smartindent = true
+    
+    -- Enhanced keymaps for C++
+    map("n", "<leader>cf", "<cmd>ClangFormat<CR>", { buffer = true, desc = "Format C++" })
+    map("n", "<leader>ci", "<cmd>ClangdSwitchSourceHeader<CR>", { buffer = true, desc = "Switch Header/Source" })
+    
+    -- Debug keymaps
+    map("n", "<leader>db", "<cmd>DapToggleBreakpoint<CR>", { buffer = true, desc = "Toggle Breakpoint" })
+    map("n", "<leader>dc", "<cmd>DapContinue<CR>", { buffer = true, desc = "Continue Debug" })
+    map("n", "<leader>do", "<cmd>DapStepOver<CR>", { buffer = true, desc = "Step Over" })
+    map("n", "<leader>di", "<cmd>DapStepInto<CR>", { buffer = true, desc = "Step Into" })
+    map("n", "<leader>dO", "<cmd>DapStepOut<CR>", { buffer = true, desc = "Step Out" })
+    map("n", "<leader>dt", "<cmd>DapTerminate<CR>", { buffer = true, desc = "Terminate Debug" })
+    
+    -- Build and compile keymaps
+    map("n", "<leader>cb", "<cmd>CMakeBuild<CR>", { buffer = true, desc = "CMake Build" })
+    map("n", "<leader>cr", "<cmd>CMakeRun<CR>", { buffer = true, desc = "CMake Run" })
+    map("n", "<leader>cd", "<cmd>CMakeDebug<CR>", { buffer = true, desc = "CMake Debug" })
+  end,
+})
+
+-- Global C++ compile command (available everywhere)
+vim.api.nvim_create_user_command("CppCompile", function()
+  local file = vim.fn.expand("%:p")
+  local output = vim.fn.expand("%:p:r")
+  vim.cmd("terminal g++ -std=c++20 -Wall -Wextra -g " .. file .. " -o " .. output)
+end, { desc = "Compile current C++ file" })
+
+-- Optional: Add a global keymap for C++ compilation
+map("n", "<leader>cc", "<cmd>CppCompile<CR>", { desc = "Compile C++ File" })
 
 -- ======================
 -- Emmet
@@ -68,6 +111,5 @@ map({ "n", "v" }, "<leader>wv", function()
 end, { desc = "waksAI: Explain code (selection or file)" })
 
 -- ======================
--- BETTER NAVIGATION 
--- ====================== 
-
+-- BETTER NAVIGATION
+-- ======================
