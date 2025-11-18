@@ -3,11 +3,11 @@ return {
   -- Treesitter for Python + Django templates
   {
     "nvim-treesitter/nvim-treesitter",
-    build = ":TSUpdate",
-    opts = {
-      ensure_installed = { "python", "htmldjango" },
-      highlight = { enable = true },
-    },
+    opts = function(_, opts)
+      if type(opts.ensure_installed) == "table" then
+        vim.list_extend(opts.ensure_installed, { "python", "htmldjango" })
+      end
+    end,
   },
 
   -- LSP Config (pyright + py_lsp)
@@ -16,24 +16,29 @@ return {
     dependencies = {
       "HallerPatrick/py_lsp.nvim",
     },
-    config = function()
-      local lspconfig = require("lspconfig")
-
-      lspconfig.pyright.setup({
-        settings = {
-          python = {
-            analysis = {
-              typeCheckingMode = "basic", -- change to "strict" if needed
-              autoSearchPaths = true,
-              useLibraryCodeForTypes = true,
+    opts = {
+      servers = {
+        pyright = {
+          settings = {
+            python = {
+              analysis = {
+                typeCheckingMode = "basic",
+                autoSearchPaths = true,
+                useLibraryCodeForTypes = true,
+              },
             },
           },
         },
-      })
-
+      },
+    },
+    config = function(_, opts)
+      -- Setup py_lsp
       require("py_lsp").setup({
         source_strategies = { "default", "system" },
       })
+      
+      -- Setup pyright with the provided options
+      require("lspconfig").pyright.setup(opts.servers.pyright)
     end,
   },
 
@@ -43,8 +48,7 @@ return {
     dependencies = {
       "mfussenegger/nvim-dap-python",
       "rcarriga/nvim-dap-ui",
-      "nvim-neotest/nvim-nio", -- 🔥 REQUIRED dependency for dap-ui
-      "williamboman/mason.nvim",
+      "nvim-neotest/nvim-nio",
     },
     config = function()
       local dap = require("dap")
@@ -80,7 +84,7 @@ return {
     end,
   },
 
-  -- Formatter & Linter for Django templates (djlint + black + isort)
+  -- Formatter & Linter for Django templates
   {
     "stevearc/conform.nvim",
     opts = {

@@ -16,7 +16,7 @@ return {
   { "neovim/nvim-lspconfig", config = true },
 
   -- waksAI (local plugin)
-  { dir = "~/path/to/nvim/waksAI" },
+  { dir = "~/.config/nvim/waksAI" },
 
   -- Completion
   {

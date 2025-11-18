@@ -1,4 +1,3 @@
-
 return {
   {
     "hrsh7th/nvim-cmp",
@@ -31,7 +30,6 @@ return {
           ["<C-e>"] = cmp.mapping.abort(),
           ["<CR>"] = cmp.mapping.confirm({ select = true }),
 
-          -- Tab for next item / expand snippet
           ["<Tab>"] = cmp.mapping(function(fallback)
             if cmp.visible() then
               cmp.select_next_item()
@@ -42,7 +40,6 @@ return {
             end
           end, { "i", "s" }),
 
-          -- Shift-Tab for previous item / snippet jump back
           ["<S-Tab>"] = cmp.mapping(function(fallback)
             if cmp.visible() then
               cmp.select_prev_item()
@@ -53,13 +50,73 @@ return {
             end
           end, { "i", "s" }),
         }),
+
+        -- 📦 Completion sources
         sources = cmp.config.sources({
           { name = "nvim_lsp" },
           { name = "luasnip" },
           { name = "buffer" },
           { name = "path" },
-          { name = "render-markdown"}
+          { name = "render-markdown" },
         }),
+
+        -- 🧱 Floating boxed style
+        window = {
+          completion = cmp.config.window.bordered({
+            border = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" },
+            winhighlight = "Normal:Normal,FloatBorder:CmpBorder,CursorLine:CmpSel,Search:None",
+            scrollbar = true,
+          }),
+          documentation = cmp.config.window.bordered({
+            border = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" },
+          }),
+        },
+
+        -- 🧩 Add icons & labels
+        formatting = {
+          fields = { "kind", "abbr", "menu" },
+          format = function(entry, vim_item)
+            local kind_icons = {
+              Text = "",
+              Method = "",
+              Function = "󰊕",
+              Constructor = "",
+              Field = "",
+              Variable = "",
+              Class = "",
+              Interface = "",
+              Module = "",
+              Property = "",
+              Unit = "",
+              Value = "",
+              Enum = "",
+              Keyword = "",
+              Snippet = "",
+              Color = "",
+              File = "",
+              Reference = "",
+              Folder = "",
+              EnumMember = "",
+              Constant = "",
+              Struct = "",
+              Event = "",
+              Operator = "",
+              TypeParameter = "",
+            }
+
+            vim_item.kind = string.format("%s %s", kind_icons[vim_item.kind] or "", vim_item.kind)
+            vim_item.menu = ({
+              nvim_lsp = "[LSP]",
+              luasnip = "[Snip]",
+              buffer = "[Buf]",
+              path = "[Path]",
+            })[entry.source.name]
+            return vim_item
+          end,
+        },
+      })
+      cmp.setup({
+        completion = { completeopt = "menu,menuone,noselect" },
       })
 
       -- Use cmp on `/` for searching
@@ -73,8 +130,19 @@ return {
         mapping = cmp.mapping.preset.cmdline(),
         sources = cmp.config.sources({ { name = "path" } }, { { name = "cmdline" } }),
       })
+
+      -- 🖌️ Custom highlight styles for the completion popup
+      vim.api.nvim_create_autocmd("ColorScheme", {
+        pattern = "*",
+        callback = function()
+          vim.api.nvim_set_hl(0, "CmpBorder", { fg = "#6b6b6b", bg = "NONE" })
+          vim.api.nvim_set_hl(0, "CmpDocBorder", { fg = "#6b6b6b", bg = "NONE" })
+          vim.api.nvim_set_hl(0, "CmpSel", { bg = "#0f0f14", fg = "#ffffff", bold = true })
+          vim.api.nvim_set_hl(0, "Pmenu", { bg = "#131313", fg = "#c0c0c0" })
+          vim.api.nvim_set_hl(0, "PmenuSel", { bg = "#0f0f14", fg = "#ffffff", bold = true })
+        end,
+      })
     end,
   },
   { "rafamadriz/friendly-snippets" },
 }
-

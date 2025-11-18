@@ -29,7 +29,7 @@ return {
               "Makefile",
               ".git",
               "*.uproject", -- Unreal Engine
-              "*.sln", -- Visual Studio
+              "*.sln",      -- Visual Studio
               "compile_commands.json"
             )(fname) or util.find_git_ancestor(fname) or util.path.dirname(fname)
           end,
@@ -69,9 +69,9 @@ return {
         cmake_build_directory_prefix = "build/", -- when cmake_build_directory is ""
         cmake_generate_options = { "-D", "CMAKE_EXPORT_COMPILE_COMMANDS=1" },
         cmake_build_options = {},
-        cmake_console_size = 10, -- cmake output window height
+        cmake_console_size = 10,       -- cmake output window height
         cmake_show_console = "always", -- "always", "only_on_error"
-        cmake_dap_configuration = { -- debug settings for cmake
+        cmake_dap_configuration = {    -- debug settings for cmake
           name = "cpp",
           type = "codelldb",
           request = "launch",
@@ -171,29 +171,34 @@ return {
   },
 
   -- C++ Specific Tools and Utilities
+  -- Better C++ snippets and utilities
   {
-    "Badhi/nvim-treesitter-cpp-tools",
-    dependencies = { "nvim-treesitter/nvim-treesitter" },
-    config = function()
-      require("nt-cpp-tools").setup({
-        preview = {
-          quit = "q", -- optional keymapping for quit preview
-          accept = "<tab>" -- optional keymapping for accept preview
-        },
-        header_extension = "h", -- optional
-        source_extension = "cxx", -- optional
-        custom_define_class_function_commands = { -- optional
-          TSCppDefineClass = {
-            output_handle = require("nt-cpp-tools.output_handlers").get_prepend_output_handler(
-              { "#include <iostream>", "" }, 
-              { "std::cout", "std::endl" }
-            ),
-          },
-          -- Other commands here
-        }
-      })
-    end,
+    "octaltree/cmp-look", -- Optional: for keyword completion
   },
+
+  -- Remove this problematic plugin from cpp.lua:
+  -- {
+  --   "Badhi/nvim-treesitter-cpp-tools",
+  --   dependencies = { "nvim-treesitter/nvim-treesitter" },
+  --   config = function()
+  --     require("nt-cpp-tools").setup({
+  --       preview = {
+  --         quit = "q", -- optional keymapping for quit preview
+  --         accept = "<tab>" -- optional keymapping for accept preview
+  --       },
+  --       header_extension = "h", -- optional
+  --       source_extension = "cxx", -- optional
+  --       custom_define_class_function_commands = { -- optional
+  --         TSCppDefineClass = {
+  --           output_handle = require("nt-cpp-tools.output_handlers").get_prepend_output_handler( -- THIS LINE CAUSES ERROR
+  --             { "#include <iostream>", "" },
+  --             { "std::cout", "std::endl" }
+  --           ),
+  --         },
+  --       }
+  --     })
+  --   end,
+  -- },
 
   -- Game Development Specific Plugins
   {
@@ -210,11 +215,13 @@ return {
   -- Unreal Engine Specific Support
   {
     "aca/emmet-ls", -- Useful for Unreal's UI systems
-    config = function()
-      require("lspconfig").emmet_ls.setup({
-        filetypes = { "html", "css", "javascriptreact", "typescriptreact", "xml" },
-      })
-    end,
+    opts = {
+      servers = {
+        emmet_ls = {
+          filetypes = { "html", "css", "javascriptreact", "typescriptreact", "xml" },
+        },
+      },
+    },
   },
 
   -- C++ Test Integration
@@ -222,18 +229,18 @@ return {
     "klen/nvim-test",
     config = function()
       require("nvim-test").setup({
-        run = true, -- run tests (using for debug)
-        commands_create = true, -- create commands (TestFile, TestLast, ...)
+        run = true,               -- run tests (using for debug)
+        commands_create = true,   -- create commands (TestFile, TestLast, ...)
         filename_modifier = ":.", -- modify filenames before tests run(:h filename-modifiers)
-        silent = false, -- less notifications
-        term = "terminal", -- a terminal to run ("terminal"|"toggleterm")
+        silent = false,           -- less notifications
+        term = "terminal",        -- a terminal to run ("terminal"|"toggleterm")
         termOpts = {
           direction = "vertical", -- terminal's direction ("horizontal"|"vertical"|"float")
-          width = 96, -- terminal's width (for vertical|float)
-          height = 24, -- terminal's height (for horizontal|float)
-          go_back = false, -- return focus to original window after executing
-          stopinsert = "auto", -- exit from insert mode (true|false|"auto")
-          keep_one = true, -- keep only one terminal for testing
+          width = 96,             -- terminal's width (for vertical|float)
+          height = 24,            -- terminal's height (for horizontal|float)
+          go_back = false,        -- return focus to original window after executing
+          stopinsert = "auto",    -- exit from insert mode (true|false|"auto")
+          keep_one = true,        -- keep only one terminal for testing
         },
         runners = {
           cpp = "nvim-test.runners.gtest",
@@ -268,18 +275,18 @@ return {
           close = "q", -- close the list
           cancel = "<esc>", -- cancel the preview and get back to your last window / buffer / cursor
           refresh = "r", -- manually refresh
-          jump = {"<cr>", "<tab>"}, -- jump to the diagnostic or open / close folds
+          jump = { "<cr>", "<tab>" }, -- jump to the diagnostic or open / close folds
           open_split = { "<c-x>" }, -- open buffer in new split
           open_vsplit = { "<c-v>" }, -- open buffer in new vsplit
           open_tab = { "<c-t>" }, -- open buffer in new tab
-          jump_close = {"o"}, -- jump to the diagnostic and close the list
+          jump_close = { "o" }, -- jump to the diagnostic and close the list
           toggle_mode = "m", -- toggle between "workspace" and "document" diagnostics mode
           toggle_preview = "P", -- toggle auto_preview
           hover = "K", -- opens a small popup with the full multiline message
           preview = "p", -- preview the diagnostic location
-          close_folds = {"zM", "zm"}, -- close all folds
-          open_folds = {"zR", "zr"}, -- open all folds
-          toggle_fold = {"zA", "za"}, -- toggle fold of current file
+          close_folds = { "zM", "zm" }, -- close all folds
+          open_folds = { "zR", "zr" }, -- open all folds
+          toggle_fold = { "zA", "za" }, -- toggle fold of current file
           previous = "k", -- previous item
           next = "j" -- next item
         },
@@ -288,7 +295,7 @@ return {
         auto_close = false, -- automatically close the list when you have no diagnostics
         auto_preview = true, -- automatically preview the location of the diagnostic. <esc> to close preview and go back to last window
         auto_fold = false, -- automatically fold a file trouble list at creation
-        auto_jump = {"lsp_definitions"}, -- for the given modes, automatically jump if there is only a single result
+        auto_jump = { "lsp_definitions" }, -- for the given modes, automatically jump if there is only a single result
         signs = {
           -- icons / text used for a diagnostic
           error = "",
@@ -302,7 +309,8 @@ return {
 
       -- Trouble keymaps
       vim.keymap.set("n", "<leader>xx", "<cmd>TroubleToggle<CR>", { desc = "Trouble Toggle" })
-      vim.keymap.set("n", "<leader>xw", "<cmd>TroubleToggle workspace_diagnostics<CR>", { desc = "Workspace Diagnostics" })
+      vim.keymap.set("n", "<leader>xw", "<cmd>TroubleToggle workspace_diagnostics<CR>",
+        { desc = "Workspace Diagnostics" })
       vim.keymap.set("n", "<leader>xd", "<cmd>TroubleToggle document_diagnostics<CR>", { desc = "Document Diagnostics" })
       vim.keymap.set("n", "<leader>xl", "<cmd>TroubleToggle loclist<CR>", { desc = "Location List" })
       vim.keymap.set("n", "<leader>xq", "<cmd>TroubleToggle quickfix<CR>", { desc = "Quickfix List" })
@@ -316,6 +324,48 @@ return {
       ensure_installed = {
         "clangd",
         "cmake",
+      },
+    },
+  },
+  {
+    "stevearc/conform.nvim",
+    event = { "BufWritePre" },
+    cmd = { "ConformInfo" },
+    keys = {
+      {
+        "<leader>cf",
+        function()
+          require("conform").format({ async = true, lsp_fallback = true })
+        end,
+        mode = "",
+        desc = "Format buffer",
+      },
+    },
+    opts = {
+      formatters_by_ft = {
+        c = { "clang-format" },
+        cpp = { "clang-format" },
+        h = { "clang-format" },
+        hpp = { "clang-format" },
+        rust = { "rustfmt" },
+        lua = { "stylua" },
+        python = { "isort", "black" },
+        javascript = { "prettier" },
+        typescript = { "prettier" },
+        json = { "prettier" },
+        yaml = { "prettier" },
+        markdown = { "prettier" },
+      },
+      format_on_save = {
+        timeout_ms = 500,
+        lsp_fallback = true,
+      },
+      formatters = {
+        ["clang-format"] = {
+          prepend_args = {
+            "--style={BasedOnStyle: LLVM, IndentWidth: 4, TabWidth: 4, UseTab: Never, BreakBeforeBraces: Allman, AllowShortIfStatementsOnASingleLine: false, AllowShortLoopsOnASingleLine: false, AllowShortFunctionsOnASingleLine: None, AllowShortBlocksOnASingleLine: Never, IndentCaseLabels: true, ColumnLimit: 100}",
+          },
+        },
       },
     },
   },

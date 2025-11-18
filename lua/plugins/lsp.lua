@@ -14,6 +14,41 @@ return {
       local lspconfig = require("lspconfig")
       local capabilities = require("cmp_nvim_lsp").default_capabilities()
 
+      local border_style = { "╭", "─", "╮", "│", "╯", "─", "╰", "│" } -- 🔹 Box border style
+      local icons = {
+        [vim.diagnostic.severity.ERROR] = " ",
+        [vim.diagnostic.severity.WARN]  = " ",
+        [vim.diagnostic.severity.INFO]  = " ",
+        [vim.diagnostic.severity.HINT]  = " ",
+      }
+
+      vim.api.nvim_set_hl(0, "NormalFloat", { bg = "#101010" })
+      vim.api.nvim_set_hl(0, "FloatBorder", { fg = "#6b6b6b", bg = "#101010" })
+
+      -- 🔹 Global diagnostic appearance
+      vim.diagnostic.config({
+        underline = true,
+        update_in_insert = true,
+        severity_sort = true,
+        virtual_text = false, -- disable inline spam
+        float = {
+          border = border_style,
+          focusable = false,
+          source = "always",
+          header = { "  Diagnostics", "Title" },
+          prefix = function(diagnostic, i)
+            return string.format("%s%d. ", icons[diagnostic.severity], i)
+          end,
+          max_width = 80,
+        },
+      })
+
+      -- 🔹 Diagnostic signs in gutter
+      for type, icon in pairs({ Error = " ", Warn = " ", Hint = " ", Info = " " }) do
+        local hl = "DiagnosticSign" .. type
+        vim.fn.sign_define(hl, { text = icon, texthl = hl, numhl = "" })
+      end
+
       local on_attach = function(_, bufnr)
         local opts = { buffer = bufnr, noremap = true, silent = true }
 
@@ -26,9 +61,36 @@ return {
         -- Diagnostics
         vim.keymap.set("n", "[d", vim.diagnostic.goto_prev, opts)
         vim.keymap.set("n", "]d", vim.diagnostic.goto_next, opts)
-        vim.keymap.set("n", "<leader>fe", vim.diagnostic.open_float, opts)
 
-        -- Autoformat
+        vim.keymap.set("n", "<leader>fe", function()
+          vim.diagnostic.open_float(nil, {
+            focus = false,
+            scope = "cursor",
+            border = border_style,
+            header = { "  Diagnostics", "Title" },
+            prefix = function(diagnostic, i)
+              return string.format("%s%d. ", icons[diagnostic.severity], i)
+            end,
+          })
+        end, opts)
+
+        -- 🔹 Auto-popup diagnostics (like VSCode hover)
+        vim.api.nvim_create_autocmd("CursorHold", {
+          buffer = bufnr,
+          callback = function()
+            vim.diagnostic.open_float(nil, {
+              focus = false,
+              scope = "cursor",
+              border = border_style,
+              header = { "  Diagnostics", "Title" },
+              prefix = function(diagnostic, i)
+                return string.format("%s%d. ", icons[diagnostic.severity], i)
+              end,
+            })
+          end,
+        })
+
+        -- Autoformat before save
         vim.api.nvim_create_autocmd("BufWritePre", {
           buffer = bufnr,
           callback = function()

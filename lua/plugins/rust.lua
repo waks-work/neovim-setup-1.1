@@ -272,8 +272,13 @@ return {
     dependencies = { "nvim-lua/plenary.nvim" },
     config = function()
       local builtin = require("telescope.builtin")
+
+      -- 🕶️ Custom highlights for Telescope
+      vim.api.nvim_set_hl(0, "TelescopeNormal", { bg = "#131313" })
+      vim.api.nvim_set_hl(0, "TelescopeSelection", { bg = "#0f0f14", bold = true })
+
       vim.keymap.set("n", "<leader>fs", builtin.lsp_document_symbols, { desc = "Search document symbols" })
-      vim.keymap.set("n", "<leader>wc", builtin.lsp_workspace_symbols, { desc = "Search workspace symbols" })
+      vim.keymap.set("n", "<leader>wf", builtin.lsp_workspace_symbols, { desc = "Search workspace symbols" })
       vim.keymap.set("n", "<leader>fc", builtin.find_files, { desc = "Find files" })
     end,
   },

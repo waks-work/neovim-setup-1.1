@@ -20,7 +20,7 @@ map("n", "<leader>cl", "<cmd>NvimTreeCollapse<CR>", { desc = "Collapse Tree", si
 map("n", "<leader>ff", "<cmd>Telescope find_files<CR>", { desc = "Find Files", silent = true })
 map("n", "<leader>fg", "<cmd>Telescope live_grep<CR>", { desc = "Live Grep", silent = true })
 map("n", "<leader>fb", "<cmd>Telescope buffers<CR>", { desc = "Open Buffers", silent = true })
-map("n", "<leader>fh", "<cmd>Telescope git_file_history<CR>", { desc = "File History (Git)", silent = true })
+map("n", "<leader>gf", "<cmd>Telescope git_file_history<CR>", { desc = "File History (Git)", silent = true })
 
 -- ======================
 -- Quick Save / Quit
@@ -49,11 +49,11 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.expandtab = false
     vim.opt_local.cindent = true
     vim.opt_local.smartindent = true
-    
+
     -- Enhanced keymaps for C++
     map("n", "<leader>cf", "<cmd>ClangFormat<CR>", { buffer = true, desc = "Format C++" })
     map("n", "<leader>ci", "<cmd>ClangdSwitchSourceHeader<CR>", { buffer = true, desc = "Switch Header/Source" })
-    
+
     -- Debug keymaps
     map("n", "<leader>db", "<cmd>DapToggleBreakpoint<CR>", { buffer = true, desc = "Toggle Breakpoint" })
     map("n", "<leader>dc", "<cmd>DapContinue<CR>", { buffer = true, desc = "Continue Debug" })
@@ -61,7 +61,7 @@ vim.api.nvim_create_autocmd("FileType", {
     map("n", "<leader>di", "<cmd>DapStepInto<CR>", { buffer = true, desc = "Step Into" })
     map("n", "<leader>dO", "<cmd>DapStepOut<CR>", { buffer = true, desc = "Step Out" })
     map("n", "<leader>dt", "<cmd>DapTerminate<CR>", { buffer = true, desc = "Terminate Debug" })
-    
+
     -- Build and compile keymaps
     map("n", "<leader>cb", "<cmd>CMakeBuild<CR>", { buffer = true, desc = "CMake Build" })
     map("n", "<leader>cr", "<cmd>CMakeRun<CR>", { buffer = true, desc = "CMake Run" })
@@ -109,6 +109,92 @@ map({ "n", "v" }, "<leader>wv", function()
     end)
   end
 end, { desc = "waksAI: Explain code (selection or file)" })
+
+-- ======================
+-- Rust Specific Keymaps (Global - for WhichKey)
+-- ======================
+-- These are global keymaps that show in WhichKey but only work in Rust files
+map("n", "<leader>rr", function()
+  if vim.bo.filetype == "rust" then
+    vim.notify("Rust: Open runnables (requires LSP)", vim.log.levels.INFO)
+  else
+    vim.notify("Not a Rust file", vim.log.levels.WARN)
+  end
+end, { desc = "Rust: Runnables" })
+
+map("n", "<leader>rl", function()
+  if vim.bo.filetype == "rust" then
+    vim.notify("Rust: Toggle inlay hints (requires LSP)", vim.log.levels.INFO)
+  else
+    vim.notify("Not a Rust file", vim.log.levels.WARN)
+  end
+end, { desc = "Rust: Toggle inlay hints" })
+
+map("n", "<leader>rh", function()
+  if vim.bo.filetype == "rust" then
+    vim.notify("Rust: Hover actions (requires LSP)", vim.log.levels.INFO)
+  else
+    vim.notify("Not a Rust file", vim.log.levels.WARN)
+  end
+end, { desc = "Rust: Hover actions" })
+
+map("n", "<leader>ra", function()
+  if vim.bo.filetype == "rust" then
+    vim.notify("Rust: Code actions (requires LSP)", vim.log.levels.INFO)
+  else
+    vim.notify("Not a Rust file", vim.log.levels.WARN)
+  end
+end, { desc = "Rust: Code actions" })
+
+map("n", "<leader>rp", function()
+  if vim.bo.filetype == "rust" then
+    vim.notify("Rust: Parent module (requires LSP)", vim.log.levels.INFO)
+  else
+    vim.notify("Not a Rust file", vim.log.levels.WARN)
+  end
+end, { desc = "Rust: Parent module" })
+
+map("n", "<leader>rj", function()
+  if vim.bo.filetype == "rust" then
+    vim.notify("Rust: Join lines (requires LSP)", vim.log.levels.INFO)
+  else
+    vim.notify("Not a Rust file", vim.log.levels.WARN)
+  end
+end, { desc = "Rust: Join lines" })
+
+-- Format keymap (always works)
+map("n", "<leader>rf", function()
+  if vim.bo.filetype == "rust" then
+    vim.cmd("RustFmt")
+  else
+    vim.notify("Not a Rust file", vim.log.levels.WARN)
+  end
+end, { desc = "Rust: Format code" })
+
+-- Cargo.toml keymaps for crates.nvim
+map("n", "<leader>rc", function()
+  if vim.bo.filetype == "toml" then
+    require("crates").show_crate_popup()
+  else
+    vim.notify("Not a Cargo.toml file", vim.log.levels.WARN)
+  end
+end, { desc = "Rust: Show crate info" })
+
+map("n", "<leader>rv", function()
+  if vim.bo.filetype == "toml" then
+    require("crates").show_versions_popup()
+  else
+    vim.notify("Not a Cargo.toml file", vim.log.levels.WARN)
+  end
+end, { desc = "Rust: Show versions" })
+
+map("n", "<leader>rF", function()
+  if vim.bo.filetype == "toml" then
+    require("crates").show_features_popup()
+  else
+    vim.notify("Not a Cargo.toml file", vim.log.levels.WARN)
+  end
+end, { desc = "Rust: Show features" })
 
 -- ======================
 -- BETTER NAVIGATION
